@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="D.B Élagage — élagage, abattage, taille de haies, dessouchage et tonte à Chartres et dans le 28. Devis gratuit, déplacement offert.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23173626'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-family='Georgia,serif' font-weight='700' font-size='42' fill='%23FAF7EF'%3EdB%3C/text%3E%3C/svg%3E">
+<title>D.B Élagage — Élagage, abattage &amp; entretien d'espaces verts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pin:#173626;      /* vert sapin profond, réservé aux fonds sombres */
+    --bark:#2C2117;     /* écorce sombre */
+    --paper:#FAF7EF;    /* papier clair */
+    --moss:#2E6B45;     /* vert lisible sur fond clair */
+    --amber:#E8622A;    /* orange sécurité / tronçonneuse */
+    --ink:#1B1B16;       /* texte */
+    --line: rgba(27,27,22,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Libre Franklin', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .mono{
+    font-family:'Libre Franklin', sans-serif;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-size:0.74rem;
+  }
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* Respect des préférences de mouvement réduit */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky; top:0; z-index:40;
+    background:rgba(241,238,227,0.92);
+    backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px;
+    max-width:1120px; margin:0 auto;
+  }
+  .nav-left{display:flex; align-items:center; gap:16px;}
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Fraunces', serif; font-weight:700; font-size:1.15rem;
+  }
+  .brand .ring{width:38px; height:28px;}
+
+  /* menu piloté par une case à cocher cachée : fonctionne sans JavaScript */
+  .menu-toggle{display:none;}
+
+  /* burger */
+  .burger{
+    width:38px; height:34px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    cursor:pointer;
+  }
+  .burger span{
+    width:24px; height:2px; background:var(--ink);
+    transition:transform .25s ease, opacity .25s ease;
+  }
+  .burger:hover span{background:var(--amber);}
+
+  .nav-cta{
+    display:none;
+  }
+  @media (min-width:820px){ .nav-cta{display:inline-flex;} }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Libre Franklin', sans-serif; font-size:0.75rem;
+    text-transform:uppercase; letter-spacing:0.04em;
+    padding:11px 20px;
+    border:1px solid var(--ink);
+    border-radius:2px;
+    transition:background .2s ease, color .2s ease, transform .15s ease;
+  }
+  .btn:hover, .btn:focus-visible{background:var(--ink); color:var(--paper);}
+  .btn:active{transform:translateY(1px);}
+  .btn-fill{
+    background:var(--bark); color:var(--paper); border-color:var(--bark);
+  }
+  .btn-fill:hover, .btn-fill:focus-visible{background:var(--pin); border-color:var(--pin); color:var(--paper);}
+  /* ---------- MEGA MENU ---------- */
+  .mega-backdrop{
+    position:fixed; inset:0; background:rgba(23,54,38,0.35);
+    opacity:0; visibility:hidden; transition:opacity .3s ease;
+    z-index:48; cursor:default;
+  }
+  .menu-toggle:checked ~ .mega-backdrop{opacity:1; visibility:visible;}
+  .mega-menu{
+    position:fixed; top:0; left:0; height:100%;
+    width:min(360px, 88vw);
+    background:var(--paper);
+    border-right:1px solid var(--line);
+    z-index:49;
+    transform:translateX(-100%);
+    transition:transform .32s ease;
+    display:flex; flex-direction:column;
+    padding:26px 30px 30px;
+  }
+  .menu-toggle:checked ~ .mega-menu{transform:translateX(0);}
+  .mega-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom:24px;
+  }
+  .mega-brand{font-family:'Fraunces', serif; font-weight:700; font-size:1.05rem; color:var(--pin);}
+  .mega-close{
+    font-size:1.6rem; line-height:1; cursor:pointer;
+    color:var(--ink); width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mega-close:hover{color:var(--amber);}
+  .mega-close .cross{position:relative; width:16px; height:16px;}
+  .mega-close .cross::before, .mega-close .cross::after{
+    content:''; position:absolute; top:50%; left:0;
+    width:100%; height:2px; background:currentColor;
+  }
+  .mega-close .cross::before{transform:rotate(45deg);}
+  .mega-close .cross::after{transform:rotate(-45deg);}
+  .mega-list{list-style:none; flex:1;}
+  .mega-list li{border-bottom:1px solid var(--line);}
+  .mega-list li a{
+    display:block; padding:16px 2px;
+    font-family:'Fraunces', serif; font-size:1.25rem; font-weight:500;
+    color:var(--ink);
+    transition:color .2s ease, padding-left .2s ease;
+  }
+  .mega-list li a:hover, .mega-list li a:focus-visible{color:var(--amber); padding-left:8px;}
+  .mega-foot{
+    display:flex; flex-direction:column; gap:8px;
+    padding-top:20px; border-top:1px solid var(--line);
+    font-family:'Libre Franklin', sans-serif; font-size:0.85rem; color:#41423B;
+  }
+  .mega-foot a:hover{color:var(--amber);}
+  body:has(.menu-toggle:checked){overflow:hidden;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    padding:100px 0 90px;
+    background:
+      radial-gradient(ellipse 900px 500px at 82% -10%, rgba(92,122,85,0.16), transparent 60%),
+      var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap:48px;
+    align-items:center;
+  }
+  @media (max-width:860px){ .hero-grid{grid-template-columns:1fr;} }
+  .eyebrow{
+    display:flex; align-items:center; gap:10px;
+    color:var(--bark);
+    margin-bottom:22px;
+  }
+  .eyebrow .dash{width:26px; height:1px; background:var(--moss);}
+  .hero h1{
+    font-size:clamp(2.4rem, 5vw, 3.7rem);
+    line-height:1.04;
+    color:var(--pin);
+  }
+  .hero h1 em{
+    font-style:italic; color:var(--bark);
+  }
+  .hero p.lead{
+    margin-top:22px;
+    max-width:480px;
+    font-size:1.05rem;
+    color:#41423B;
+  }
+  .hero-actions{
+    display:flex; flex-wrap:wrap; gap:14px;
+    margin-top:34px;
+  }
+  .hero-perks{
+    display:flex; flex-wrap:wrap; gap:10px;
+    margin-top:16px;
+  }
+  .hero-perks span{
+    font-family:'Libre Franklin', sans-serif;
+    font-weight:600; font-size:0.78rem; letter-spacing:0.02em;
+    color:var(--bark);
+    background:rgba(46,107,69,0.09);
+    border:1px solid rgba(46,107,69,0.25);
+    padding:6px 14px;
+    border-radius:20px;
+  }
+  .hero-note{
+    margin-top:28px;
+    display:flex; gap:22px;
+    color:#5A5A50;
+  }
+  .hero-note div{font-family:'Libre Franklin', sans-serif; font-size:0.72rem; text-transform:uppercase;}
+  .hero-note strong{display:block; font-family:'Fraunces', serif; font-size:1.4rem; color:var(--bark); font-weight:600;}
+
+  /* signature: secteur d'intervention mis en avant */
+  .dept-figure{
+    text-align:center;
+    padding:40px 20px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    background:rgba(23,54,38,0.03);
+  }
+  .dept-eyebrow{
+    display:block;
+    font-family:'Libre Franklin', sans-serif;
+    font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    font-size:0.75rem; color:var(--bark);
+    margin-bottom:6px;
+  }
+  .dept-number{
+    display:block;
+    font-family:'Fraunces', serif; font-weight:700;
+    font-size:clamp(5rem, 12vw, 8rem);
+    line-height:0.95;
+    color:var(--pin);
+  }
+  .dept-caption{
+    display:block;
+    font-family:'Libre Franklin', sans-serif;
+    font-size:0.95rem; color:#41423B;
+    margin-top:6px;
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{padding:88px 0;}
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; margin-bottom:52px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:22px;
+  }
+  .section-head h2{font-size:clamp(1.7rem,3vw,2.3rem); color:var(--pin);}
+  .section-head .mono{color:var(--bark);}
+  .dark{background:var(--pin); color:var(--paper);}
+  .dark .section-head{border-bottom-color:rgba(241,238,227,0.16);}
+  .dark .section-head h2{color:var(--paper);}
+  .dark .mono{color:#9CB593;}
+
+  /* ---------- SERVICES ---------- */
+  .services{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  @media (max-width:760px){ .services{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .services{grid-template-columns:1fr;} }
+  .service{
+    background:var(--paper);
+    padding:32px 26px;
+    transition:background .2s ease;
+  }
+  .service:hover{background:#EAE6D8;}
+  .service-dash{display:block; width:28px; height:3px; background:var(--amber); margin-bottom:20px; border-radius:2px;}
+  .service h3{font-size:1.12rem; margin-bottom:8px; color:var(--bark);}
+  .service p{font-size:0.9rem; color:#54544B;}
+
+  /* ---------- PROCESS / WHY ---------- */
+  .why-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:32px;
+  }
+  @media (max-width:900px){ .why-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .why-grid{grid-template-columns:1fr;} }
+  .why-item .num{
+    font-family:'Libre Franklin', sans-serif; font-size:0.78rem; color:var(--amber);
+    display:block; margin-bottom:14px;
+  }
+  .why-item h3{color:var(--paper); font-size:1.2rem; margin-bottom:10px;}
+  .why-item p{color:#C9D1C4; font-size:0.92rem;}
+
+  /* ---------- À PROPOS / AVIS / CONFIDENTIALITÉ ---------- */
+  .apropos-box, .confid-box{max-width:640px;}
+  .apropos-box p, .confid-box p{color:#41423B; margin-bottom:16px; font-size:0.98rem;}
+  .avis-box{max-width:640px;}
+  .avis-box p{color:#C9D1C4; margin-bottom:16px; font-size:0.98rem;}
+  .avis-box .btn{margin-top:8px;}
+  .dark .btn{border-color:var(--paper); color:var(--paper);}
+  .dark .btn:hover, .dark .btn:focus-visible{background:var(--paper); color:var(--pin);}
+
+  /* ---------- ZONE ---------- */
+  .zone-box{
+    display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;
+  }
+  @media (max-width:760px){ .zone-box{grid-template-columns:1fr;} }
+  .zone-box p{color:#41423B; margin-bottom:16px; max-width:460px;}
+  .zone-list{list-style:none;}
+  .zone-list li{
+    display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line);
+    font-size:0.95rem;
+  }
+  .zone-list li:first-child{border-top:none;}
+  .zone-list .tag{
+    font-family:'Libre Franklin', sans-serif; font-size:0.7rem; color:var(--bark);
+    text-transform:uppercase; min-width:92px;
+  }
+
+  /* ---------- CONTACT ---------- */
+  .contact{
+    background:var(--bark); color:var(--paper);
+    border-radius:4px;
+    padding:64px 56px;
+    display:grid; grid-template-columns:1.2fr 1fr; gap:40px;
+    align-items:center;
+  }
+  @media (max-width:760px){ .contact{grid-template-columns:1fr; padding:44px 28px;} }
+  .contact h2{color:var(--paper); font-size:clamp(1.7rem,3vw,2.2rem); margin-bottom:14px;}
+  .contact p{color:#DCD4C0; max-width:420px;}
+  .contact-links{display:flex; flex-direction:column; gap:16px;}
+  .contact-links a{
+    display:flex; align-items:center; justify-content:space-between;
+    border:1px solid rgba(241,238,227,0.3);
+    padding:16px 20px; border-radius:2px;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .contact-links a:hover, .contact-links a:focus-visible{
+    border-color:var(--amber); background:rgba(241,238,227,0.06);
+  }
+  .contact-links .label{font-family:'Libre Franklin', sans-serif; font-size:0.68rem; text-transform:uppercase; color:#B9AF97;}
+  .contact-links .chev{
+    width:9px; height:9px; flex-shrink:0;
+    border-top:2px solid var(--paper); border-right:2px solid var(--paper);
+    transform:rotate(45deg);
+  }
+  .contact-links .value{font-family:'Fraunces', serif; font-size:1.15rem;}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding:32px 0 40px;
+    border-top:1px solid var(--line);
+  }
+  .foot-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    font-family:'Libre Franklin', sans-serif; font-size:0.7rem; text-transform:uppercase; color:#6B6B60;
+  }
+
+  /* contenu toujours visible par défaut, ne dépend plus du JavaScript */
+  .fade-up{opacity:1;}
+
+  /* ---------- FAQ ---------- */
+  .faq-list{max-width:720px;}
+  .faq-item{
+    border-top:1px solid var(--line);
+    padding:18px 0;
+  }
+  .faq-item:last-child{border-bottom:1px solid var(--line);}
+  .faq-item summary{
+    cursor:pointer;
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem;
+    color:var(--bark);
+    list-style:none;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::after{
+    content:'+';
+    font-family:'Libre Franklin', sans-serif; font-size:1.3rem; color:var(--amber);
+    flex-shrink:0;
+    transition:transform .2s ease;
+  }
+  .faq-item[open] summary::after{transform:rotate(45deg);}
+  .faq-item p{color:#41423B; margin-top:12px; max-width:600px; font-size:0.95rem;}
+
+  /* ---------- BARRE D'APPEL FIXE (mobile) ---------- */
+  .mobile-call-bar{
+    display:none;
+    position:fixed; left:0; right:0; bottom:0; z-index:45;
+    background:var(--bark); color:var(--paper);
+    padding:12px 20px 14px;
+    flex-direction:column; align-items:center; text-align:center; gap:2px;
+    box-shadow:0 -6px 18px rgba(0,0,0,0.18);
+  }
+  .mobile-call-bar span{display:block;}
+  .mobile-call-bar span:first-child{font-size:0.7rem; color:#D8CFB8; text-transform:uppercase; letter-spacing:0.05em;}
+  .mobile-call-bar-num{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem;}
+  @media (max-width:640px){
+    .mobile-call-bar{display:flex;}
+    body{padding-bottom:64px;}
+  }
+</style>
+</head>
+<body>
+
+<input type="checkbox" id="menuToggle" class="menu-toggle">
+
+<header>
+  <div class="nav">
+    <div class="nav-left">
+      <label for="menuToggle" class="burger" aria-label="Ouvrir le menu">
+        <span></span><span></span><span></span>
+      </label>
+      <a href="#top" class="brand">
+        <svg class="ring" viewBox="0 0 60 44" aria-hidden="true">
+          <text x="20" y="34" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="34" fill="#1B1B16">d</text>
+          <text x="38" y="38" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="500" font-size="26" fill="#1B1B16">B</text>
+        </svg>
+        D.B Élagage
+      </a>
+    </div>
+    <a class="btn nav-cta" href="tel:0606430241">06 06 43 02 41</a>
+  </div>
+</header>
+
+<label for="menuToggle" class="mega-backdrop" aria-hidden="true"></label>
+<nav class="mega-menu" aria-label="Menu principal">
+  <div class="mega-head">
+    <span class="mega-brand">D.B Élagage</span>
+    <label for="menuToggle" class="mega-close" aria-label="Fermer le menu"><span class="cross"></span></label>
+  </div>
+  <ul class="mega-list">
+    <li><a href="#top">Accueil</a></li>
+    <li><a href="#services">Nos services</a></li>
+    <li><a href="#pourquoi">Pourquoi nous</a></li>
+    <li><a href="#apropos">À propos</a></li>
+    <li><a href="#avis">Avis clients</a></li>
+    <li><a href="#zone">Zone d'intervention</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contactez-nous</a></li>
+    <li><a href="#confidentialite">Confidentialité</a></li>
+  </ul>
+  <div class="mega-foot">
+    <a href="tel:0606430241">06 06 43 02 41</a>
+    <a href="mailto:d.b.elagage28@gmail.com">d.b.elagage28@gmail.com</a>
+  </div>
+</nav>
+
+<main id="top">
+
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dash"></span><span class="mono">Élagage &amp; entretien d'espaces verts</span></div>
+        <h1>L'arbre taillé <em>net</em>,<br>le terrain rendu propre.</h1>
+        <p class="lead">D.B Élagage intervient sur vos arbres et vos extérieurs : coupe précise, sécurité du chantier et nettoyage complet à chaque passage.</p>
+        <div class="hero-actions">
+          <a class="btn btn-fill" href="tel:0606430241">Appeler — 06 06 43 02 41</a>
+          <a class="btn" href="mailto:d.b.elagage28@gmail.com">Demander un devis</a>
+        </div>
+        <div class="hero-perks">
+          <span>Devis gratuit</span>
+          <span>Déplacement offert</span>
+          <span>Prix ultra compétitifs</span>
+        </div>
+        <div class="hero-note">
+          <div><strong>20 ans</strong>d'expérience</div>
+          <div><strong>100%</strong>chantier nettoyé</div>
+          <div><strong>&lt;48h</strong>délai de réponse</div>
+        </div>
+      </div>
+      <div class="dept-figure" aria-hidden="true">
+        <span class="dept-eyebrow">Secteur d'intervention</span>
+        <span class="dept-number">28</span>
+        <span class="dept-caption">Eure-et-Loir — Chartres et environs</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section" id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Nos interventions</h2>
+        <span class="mono">Un savoir-faire, cinq usages</span>
+      </div>
+      <div class="services">
+
+        <div class="service fade-up">
+          <span class="service-dash"></span>
+          <h3>Élagage</h3>
+          <p>Taille raisonnée des branches pour la santé de l'arbre, la lumière au sol et la sécurité des passages.</p>
+        </div>
+
+        <div class="service fade-up">
+          <span class="service-dash"></span>
+          <h3>Abattage</h3>
+          <p>Démontage ou coupe complète d'arbres dangereux, morts ou gênants, en toute sécurité.</p>
+        </div>
+
+        <div class="service fade-up">
+          <span class="service-dash"></span>
+          <h3>Taille de haies</h3>
+          <p>Mise à niveau et entretien régulier pour des haies droites, denses et bien dessinées.</p>
+        </div>
+
+        <div class="service fade-up">
+          <span class="service-dash"></span>
+          <h3>Dessouchage</h3>
+          <p>Retrait complet des souches après abattage, pour libérer et réutiliser l'espace au sol.</p>
+        </div>
+
+        <div class="service fade-up">
+          <span class="service-dash"></span>
+          <h3>Tonte</h3>
+          <p>Entretien régulier des pelouses, seul ou en complément d'une intervention sur les arbres.</p>
+        </div>
+
+        <div class="service fade-up">
+          <span class="service-dash"></span>
+          <h3>Et plus encore</h3>
+          <p>Débroussaillage, évacuation des déchets verts, entretien ponctuel : parlons de votre besoin précis.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- POURQUOI -->
+  <section class="section dark" id="pourquoi">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Pourquoi D.B Élagage</h2>
+        <span class="mono">Trois engagements tenus à chaque chantier</span>
+      </div>
+      <div class="why-grid">
+        <div class="why-item fade-up">
+          <span class="num">Expérience</span>
+          <h3>20 ans d'expérience</h3>
+          <p>Deux décennies passées à intervenir sur des arbres de toute taille, dans toutes les configurations de terrain.</p>
+        </div>
+        <div class="why-item fade-up">
+          <span class="num">01 — Coupe</span>
+          <h3>Un geste précis</h3>
+          <p>Chaque coupe est pensée pour la reprise de l'arbre et l'équilibre de son port, pas seulement pour raccourcir.</p>
+        </div>
+        <div class="why-item fade-up">
+          <span class="num">02 — Sécurité</span>
+          <h3>Un chantier maîtrisé</h3>
+          <p>Matériel adapté et périmètre sécurisé, même en hauteur ou à proximité d'un bâtiment.</p>
+        </div>
+        <div class="why-item fade-up">
+          <span class="num">03 — Propreté</span>
+          <h3>Un terrain rendu net</h3>
+          <p>Branches, souches et déchets évacués : à la fin du chantier, il ne reste que le travail bien fait.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- À PROPOS -->
+  <section class="section" id="apropos">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>À propos</h2>
+        <span class="mono">Un artisan, pas un centre d'appels</span>
+      </div>
+      <div class="apropos-box">
+        <p>D.B Élagage, c'est 20 ans de métier au contact des arbres : leur croissance, leurs faiblesses, la meilleure façon de les tailler sans les abîmer. L'entreprise intervient à Chartres et dans les communes du 28, chez les particuliers comme chez les professionnels.</p>
+        <p>Chaque devis est établi après une visite sur place, sans engagement. Le même soin est apporté du premier appel jusqu'au nettoyage final du chantier.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVIS -->
+  <section class="section dark" id="avis">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Avis clients</h2>
+        <span class="mono">La page se construit</span>
+      </div>
+      <div class="avis-box">
+        <p>Cette rubrique est en cours de construction : les avis affichés ici seront ceux de clients réels de D.B Élagage, rien d'autre.</p>
+        <p>Vous avez déjà fait appel à nos services ? Votre retour nous aide et aide les prochains clients.</p>
+        <a class="btn" href="mailto:d.b.elagage28@gmail.com?subject=Mon%20avis%20sur%20D.B%20%C3%89lagage">Laisser un avis par mail</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE -->
+  <section class="section" id="zone">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Zone d'intervention</h2>
+        <span class="mono">À domicile, sur devis</span>
+      </div>
+      <div class="zone-box">
+        <div>
+          <p>D.B Élagage intervient à Chartres et dans les communes environnantes, chez les particuliers comme les professionnels.</p>
+          <p>Chaque devis est établi gratuitement après une visite sur place, selon la taille des arbres, l'accès au terrain et les contraintes de sécurité.</p>
+        </div>
+        <ul class="zone-list">
+          <li><span class="tag">Secteur</span> Chartres et environs</li>
+          <li><span class="tag">Public</span> Particuliers &amp; professionnels</li>
+          <li><span class="tag">Visite</span> Estimation gratuite sur site</li>
+          <li><span class="tag">Délai</span> Réponse sous 48h</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Questions fréquentes</h2>
+        <span class="mono">Avant d'appeler</span>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Le devis est-il vraiment gratuit ?</summary>
+          <p>Oui. La visite sur place et l'estimation sont gratuites et sans engagement, que le chantier se fasse ou non.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Le déplacement est-il facturé ?</summary>
+          <p>Non, le déplacement est offert pour l'estimation dans le secteur de Chartres et ses environs.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Intervenez-vous chez les particuliers et les professionnels ?</summary>
+          <p>Oui, les deux : jardins privés, copropriétés, entreprises et collectivités.</p>
+        </details>
+        <details class="faq-item">
+          <summary>En combien de temps avez-vous une réponse ?</summary>
+          <p>Sous 48h après votre appel ou votre mail, pour convenir d'un créneau de visite.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Que faites-vous des déchets verts et du bois coupé ?</summary>
+          <p>Le chantier est évacué et nettoyé à la fin de l'intervention. Précisez-nous vos souhaits (récupération du bois, par exemple) lors du devis.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="contact">
+        <div>
+          <h2>Un arbre à tailler,<br>un terrain à remettre en ordre ?</h2>
+          <p>Décrivez-nous le chantier par téléphone ou par mail : nous revenons vers vous avec un créneau de visite. Devis gratuit, déplacement offert.</p>
+        </div>
+        <div class="contact-links">
+          <a href="tel:0606430241">
+            <span><span class="label">Téléphone</span><br><span class="value">06 06 43 02 41</span></span>
+            <span class="chev" aria-hidden="true"></span>
+          </a>
+          <a href="mailto:d.b.elagage28@gmail.com">
+            <span><span class="label">Email</span><br><span class="value">d.b.elagage28@gmail.com</span></span>
+            <span class="chev" aria-hidden="true"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIDENTIALITÉ -->
+  <section class="section confidentialite" id="confidentialite">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Confidentialité</h2>
+        <span class="mono">Simple et transparent</span>
+      </div>
+      <div class="confid-box">
+        <p>Ce site ne comporte aucun formulaire : les boutons "Appeler" et "Demander un devis" ouvrent directement votre téléphone ou votre messagerie. D.B Élagage ne collecte, ne stocke et ne revend aucune donnée personnelle via ce site.</p>
+        <p>Les polices de caractères sont chargées depuis Google Fonts, ce qui peut entraîner une requête technique vers les serveurs de Google lors de l'affichage de la page.</p>
+        <p>Pour toute question sur vos données, contactez D.B Élagage directement par téléphone ou par mail.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>D.B Élagage</span>
+    <span>Élagage · Abattage · Haies · Dessouchage · Tonte</span>
+  </div>
+</footer>
+
+<a href="tel:0606430241" class="mobile-call-bar">
+  <span>Besoin d'un devis ?</span>
+  <span class="mobile-call-bar-num">Appeler — 06 06 43 02 41</span>
+</a>
+
+<script>
+  /* Confort en plus si le JavaScript s'exécute : ferme le menu après un clic sur un lien.
+     Le menu fonctionne déjà sans JavaScript grâce à la case cachée (#menuToggle). */
+  const menuToggle = document.getElementById('menuToggle');
+  if(menuToggle){
+    document.querySelectorAll('.mega-menu a').forEach(a => {
+      a.addEventListener('click', () => { menuToggle.checked = false; });
+    });
+  }
+</script>
+
+</body>
+</html>
