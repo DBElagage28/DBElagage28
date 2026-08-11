@@ -73,11 +73,14 @@
   }
   .brand .ring{width:38px; height:28px;}
 
+  /* menu piloté par une case à cocher cachée : fonctionne sans JavaScript */
+  .menu-toggle{display:none;}
+
   /* burger */
   .burger{
     width:38px; height:34px;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-    background:none; border:none; cursor:pointer; padding:0;
+    cursor:pointer;
   }
   .burger span{
     width:24px; height:2px; background:var(--ink);
@@ -108,9 +111,9 @@
   .mega-backdrop{
     position:fixed; inset:0; background:rgba(23,54,38,0.35);
     opacity:0; visibility:hidden; transition:opacity .3s ease;
-    z-index:48;
+    z-index:48; cursor:default;
   }
-  .mega-backdrop.open{opacity:1; visibility:visible;}
+  .menu-toggle:checked ~ .mega-backdrop{opacity:1; visibility:visible;}
   .mega-menu{
     position:fixed; top:0; left:0; height:100%;
     width:min(360px, 88vw);
@@ -122,17 +125,25 @@
     display:flex; flex-direction:column;
     padding:26px 30px 30px;
   }
-  .mega-menu.open{transform:translateX(0);}
+  .menu-toggle:checked ~ .mega-menu{transform:translateX(0);}
   .mega-head{
     display:flex; align-items:center; justify-content:space-between;
     padding-bottom:20px; border-bottom:1px solid var(--line); margin-bottom:24px;
   }
   .mega-brand{font-family:'Fraunces', serif; font-weight:700; font-size:1.05rem; color:var(--pin);}
   .mega-close{
-    background:none; border:none; font-size:1.6rem; line-height:1; cursor:pointer;
-    color:var(--ink); padding:0; width:32px; height:32px;
+    font-size:1.6rem; line-height:1; cursor:pointer;
+    color:var(--ink); width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
   }
   .mega-close:hover{color:var(--amber);}
+  .mega-close .cross{position:relative; width:16px; height:16px;}
+  .mega-close .cross::before, .mega-close .cross::after{
+    content:''; position:absolute; top:50%; left:0;
+    width:100%; height:2px; background:currentColor;
+  }
+  .mega-close .cross::before{transform:rotate(45deg);}
+  .mega-close .cross::after{transform:rotate(-45deg);}
   .mega-list{list-style:none; flex:1;}
   .mega-list li{border-bottom:1px solid var(--line);}
   .mega-list li a{
@@ -148,7 +159,7 @@
     font-family:'Libre Franklin', sans-serif; font-size:0.85rem; color:#41423B;
   }
   .mega-foot a:hover{color:var(--amber);}
-  body.menu-open{overflow:hidden;}
+  body:has(.menu-toggle:checked){overflow:hidden;}
 
   /* ---------- HERO ---------- */
   .hero{
@@ -169,7 +180,7 @@
   @media (max-width:860px){ .hero-grid{grid-template-columns:1fr;} }
   .eyebrow{
     display:flex; align-items:center; gap:10px;
-    color:var(--moss);
+    color:var(--bark);
     margin-bottom:22px;
   }
   .eyebrow .dash{width:26px; height:1px; background:var(--moss);}
@@ -198,7 +209,7 @@
   .hero-perks span{
     font-family:'Libre Franklin', sans-serif;
     font-weight:600; font-size:0.78rem; letter-spacing:0.02em;
-    color:var(--moss);
+    color:var(--bark);
     background:rgba(46,107,69,0.09);
     border:1px solid rgba(46,107,69,0.25);
     padding:6px 14px;
@@ -250,7 +261,7 @@
     padding-bottom:22px;
   }
   .section-head h2{font-size:clamp(1.7rem,3vw,2.3rem); color:var(--pin);}
-  .section-head .mono{color:var(--moss);}
+  .section-head .mono{color:var(--bark);}
   .dark{background:var(--pin); color:var(--paper);}
   .dark .section-head{border-bottom-color:rgba(241,238,227,0.16);}
   .dark .section-head h2{color:var(--paper);}
@@ -311,7 +322,7 @@
   }
   .zone-list li:first-child{border-top:none;}
   .zone-list .tag{
-    font-family:'Libre Franklin', sans-serif; font-size:0.7rem; color:var(--moss);
+    font-family:'Libre Franklin', sans-serif; font-size:0.7rem; color:var(--bark);
     text-transform:uppercase; min-width:92px;
   }
 
@@ -337,6 +348,11 @@
     border-color:var(--amber); background:rgba(241,238,227,0.06);
   }
   .contact-links .label{font-family:'Libre Franklin', sans-serif; font-size:0.68rem; text-transform:uppercase; color:#B9AF97;}
+  .contact-links .chev{
+    width:9px; height:9px; flex-shrink:0;
+    border-top:2px solid var(--paper); border-right:2px solid var(--paper);
+    transform:rotate(45deg);
+  }
   .contact-links .value{font-family:'Fraunces', serif; font-size:1.15rem;}
 
   /* ---------- FOOTER ---------- */
@@ -349,11 +365,8 @@
     font-family:'Libre Franklin', sans-serif; font-size:0.7rem; text-transform:uppercase; color:#6B6B60;
   }
 
-  .fade-up{
-    opacity:1; transform:none;
-    transition:opacity .6s ease, transform .6s ease;
-  }
-  .fade-up.in{opacity:1; transform:translateY(0);}
+  /* contenu toujours visible par défaut, ne dépend plus du JavaScript */
+  .fade-up{opacity:1;}
 
   /* ---------- FAQ ---------- */
   .faq-list{max-width:720px;}
@@ -400,12 +413,14 @@
 </head>
 <body>
 
+<input type="checkbox" id="menuToggle" class="menu-toggle">
+
 <header>
   <div class="nav">
     <div class="nav-left">
-      <button class="burger" id="burgerBtn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="megaMenu">
+      <label for="menuToggle" class="burger" aria-label="Ouvrir le menu">
         <span></span><span></span><span></span>
-      </button>
+      </label>
       <a href="#top" class="brand">
         <svg class="ring" viewBox="0 0 60 44" aria-hidden="true">
           <text x="20" y="34" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="34" fill="#1B1B16">d</text>
@@ -418,29 +433,31 @@
   </div>
 </header>
 
-<div class="mega-backdrop" id="megaBackdrop"></div>
-<nav class="mega-menu" id="megaMenu" aria-label="Menu principal">
+<label for="menuToggle" class="mega-backdrop" aria-hidden="true"></label>
+<nav class="mega-menu" aria-label="Menu principal">
   <div class="mega-head">
     <span class="mega-brand">D.B Élagage</span>
-    <button class="mega-close" id="megaClose" aria-label="Fermer le menu">&times;</button>
+    <label for="menuToggle" class="mega-close" aria-label="Fermer le menu"><span class="cross"></span></label>
   </div>
   <ul class="mega-list">
     <li><a href="#top">Accueil</a></li>
-    <li><a href="#apropos">Plus sur nous</a></li>
-    <li><a href="#experience">Notre expérience</a></li>
     <li><a href="#services">Nos services</a></li>
-    <li><a href="#pourquoi">Nos engagements</a></li>
+    <li><a href="#pourquoi">Pourquoi nous</a></li>
+    <li><a href="#apropos">À propos</a></li>
+    <li><a href="#avis">Avis clients</a></li>
     <li><a href="#zone">Zone d'intervention</a></li>
-    <li><a href="#faq">Questions fréquentes</a></li>
+    <li><a href="#faq">FAQ</a></li>
     <li><a href="#contact">Contactez-nous</a></li>
+    <li><a href="#confidentialite">Confidentialité</a></li>
   </ul>
   <div class="mega-foot">
     <a href="tel:0606430241">06 06 43 02 41</a>
-    <a href="mailto:baumgartendarcy05@gmail.com">baumgartendarcy05@gmail.com</a>
+    <a href="mailto:db.elagage28@gmail.com">db.elagage28@gmail.com</a>
   </div>
 </nav>
 
 <main id="top">
+
 
   <!-- HERO -->
   <section class="hero">
@@ -451,13 +468,14 @@
         <p class="lead">D.B Élagage intervient sur vos arbres et vos extérieurs : coupe précise, sécurité du chantier et nettoyage complet à chaque passage.</p>
         <div class="hero-actions">
           <a class="btn btn-fill" href="tel:0606430241">Appeler — 06 06 43 02 41</a>
-          <a class="btn" href="mailto:baumgartendarcy05@gmail.com">Demander un devis</a>
+          <a class="btn" href="mailto:db.elagage28@gmail.com">Demander un devis</a>
         </div>
         <div class="hero-perks">
           <span>Devis gratuit</span>
           <span>Déplacement offert</span>
+          <span>Prix ultra compétitifs</span>
         </div>
-        <div class="hero-note" id="experience-note">
+        <div class="hero-note">
           <div><strong>20 ans</strong>d'expérience</div>
           <div><strong>100%</strong>chantier nettoyé</div>
           <div><strong>&lt;48h</strong>délai de réponse</div>
@@ -520,74 +538,33 @@
     </div>
   </section>
 
-  <!-- EXPÉRIENCE / ENGAGEMENTS -->
-  <section class="section dark" id="experience">
+  <!-- POURQUOI -->
+  <section class="section dark" id="pourquoi">
     <div class="wrap">
       <div class="section-head">
-        <h2>Notre expérience</h2>
-        <span class="mono">Un savoir-faire construit sur 20 ans</span>
+        <h2>Pourquoi D.B Élagage</h2>
+        <span class="mono">Trois engagements tenus à chaque chantier</span>
       </div>
       <div class="why-grid">
         <div class="why-item fade-up">
-          <span class="num">20 ANS</span>
-          <h3>Une vraie expérience</h3>
-          <p>Deux décennies passées au contact des arbres et des espaces verts, avec des interventions adaptées à chaque terrain.</p>
+          <span class="num">Expérience</span>
+          <h3>20 ans d'expérience</h3>
+          <p>Deux décennies passées à intervenir sur des arbres de toute taille, dans toutes les configurations de terrain.</p>
         </div>
         <div class="why-item fade-up">
-          <span class="num">01 — CONSEIL</span>
-          <h3>Un travail réfléchi</h3>
-          <p>Chaque intervention commence par l'analyse de votre besoin, de l'arbre et des contraintes du chantier.</p>
+          <span class="num">01 — Coupe</span>
+          <h3>Un geste précis</h3>
+          <p>Chaque coupe est pensée pour la reprise de l'arbre et l'équilibre de son port, pas seulement pour raccourcir.</p>
         </div>
         <div class="why-item fade-up">
-          <span class="num">02 — SÉCURITÉ</span>
+          <span class="num">02 — Sécurité</span>
           <h3>Un chantier maîtrisé</h3>
-          <p>Matériel adapté, organisation sérieuse et attention portée aux personnes, aux bâtiments et aux extérieurs.</p>
+          <p>Matériel adapté et périmètre sécurisé, même en hauteur ou à proximité d'un bâtiment.</p>
         </div>
         <div class="why-item fade-up">
-          <span class="num">03 — PROPRETÉ</span>
-          <h3>Un terrain rendu propre</h3>
-          <p>Le chantier est nettoyé après l'intervention afin de vous laisser un extérieur propre et agréable.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="pourquoi">
-    <div class="wrap">
-      <div class="section-head">
-        <h2>Nos engagements</h2>
-        <span class="mono">Des promesses simples et concrètes</span>
-      </div>
-      <div class="services">
-        <div class="service fade-up">
-          <span class="service-dash"></span>
-          <h3>Devis gratuit</h3>
-          <p>Une estimation claire, gratuite et sans engagement avant chaque chantier.</p>
-        </div>
-        <div class="service fade-up">
-          <span class="service-dash"></span>
-          <h3>Déplacement offert</h3>
-          <p>Nous venons sur place pour comprendre précisément votre besoin.</p>
-        </div>
-        <div class="service fade-up">
-          <span class="service-dash"></span>
-          <h3>Travail soigné</h3>
-          <p>Une attention particulière portée à la qualité de chaque intervention.</p>
-        </div>
-        <div class="service fade-up">
-          <span class="service-dash"></span>
-          <h3>Respect des délais</h3>
-          <p>Nous vous tenons informé et faisons le maximum pour respecter le délai annoncé.</p>
-        </div>
-        <div class="service fade-up">
-          <span class="service-dash"></span>
-          <h3>Chantier propre</h3>
-          <p>Branches et déchets verts sont gérés afin de laisser un terrain propre après notre passage.</p>
-        </div>
-        <div class="service fade-up">
-          <span class="service-dash"></span>
-          <h3>À votre écoute</h3>
-          <p>Un contact direct pour répondre à vos questions et vous accompagner.</p>
+          <span class="num">03 — Propreté</span>
+          <h3>Un terrain rendu net</h3>
+          <p>Branches, souches et déchets évacués : à la fin du chantier, il ne reste que le travail bien fait.</p>
         </div>
       </div>
     </div>
@@ -601,10 +578,8 @@
         <span class="mono">Un artisan, pas un centre d'appels</span>
       </div>
       <div class="apropos-box">
-        <p>D.B Élagage, c'est une entreprise spécialisée dans l'entretien des arbres et des espaces verts. Nous intervenons à Chartres et dans les communes environnantes, chez les particuliers comme chez les professionnels.</p>
-        <p>Notre expérience nous permet d'adapter chaque intervention à la situation : élagage, abattage, taille de haies, dessouchage, tonte et entretien extérieur.</p>
-        <p>Avant chaque chantier, nous prenons le temps d'échanger avec vous afin de comprendre votre besoin et les contraintes du terrain. Le devis est gratuit et sans engagement.</p>
-        <p>Notre objectif est simple : un travail sérieux, un chantier sécurisé et un extérieur propre après notre passage.</p>
+        <p>D.B Élagage, c'est 20 ans de métier au contact des arbres : leur croissance, leurs faiblesses, la meilleure façon de les tailler sans les abîmer. L'entreprise intervient à Chartres et dans les communes du 28, chez les particuliers comme chez les professionnels.</p>
+        <p>Chaque devis est établi après une visite sur place, sans engagement. Le même soin est apporté du premier appel jusqu'au nettoyage final du chantier.</p>
       </div>
     </div>
   </section>
@@ -619,7 +594,7 @@
       <div class="avis-box">
         <p>Cette rubrique est en cours de construction : les avis affichés ici seront ceux de clients réels de D.B Élagage, rien d'autre.</p>
         <p>Vous avez déjà fait appel à nos services ? Votre retour nous aide et aide les prochains clients.</p>
-        <a class="btn" href="mailto:baumgartendarcy05@gmail.com?subject=Mon%20avis%20sur%20D.B%20%C3%89lagage">Laisser un avis par mail</a>
+        <a class="btn" href="mailto:db.elagage28@gmail.com?subject=Mon%20avis%20sur%20D.B%20%C3%89lagage">Laisser un avis par mail</a>
       </div>
     </div>
   </section>
@@ -689,11 +664,11 @@
         <div class="contact-links">
           <a href="tel:0606430241">
             <span><span class="label">Téléphone</span><br><span class="value">06 06 43 02 41</span></span>
-            <span aria-hidden="true">→</span>
+            <span class="chev" aria-hidden="true"></span>
           </a>
-          <a href="mailto:baumgartendarcy05@gmail.com">
-            <span><span class="label">Email</span><br><span class="value">baumgartendarcy05@gmail.com</span></span>
-            <span aria-hidden="true">→</span>
+          <a href="mailto:db.elagage28@gmail.com">
+            <span><span class="label">Email</span><br><span class="value">db.elagage28@gmail.com</span></span>
+            <span class="chev" aria-hidden="true"></span>
           </a>
         </div>
       </div>
@@ -730,33 +705,14 @@
 </a>
 
 <script>
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
-  }, {threshold:0.15});
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  const burgerBtn = document.getElementById('burgerBtn');
-  const megaMenu = document.getElementById('megaMenu');
-  const megaBackdrop = document.getElementById('megaBackdrop');
-  const megaClose = document.getElementById('megaClose');
-
-  function openMenu(){
-    megaMenu.classList.add('open');
-    megaBackdrop.classList.add('open');
-    document.body.classList.add('menu-open');
-    burgerBtn.setAttribute('aria-expanded','true');
+  /* Confort en plus si le JavaScript s'exécute : ferme le menu après un clic sur un lien.
+     Le menu fonctionne déjà sans JavaScript grâce à la case cachée (#menuToggle). */
+  const menuToggle = document.getElementById('menuToggle');
+  if(menuToggle){
+    document.querySelectorAll('.mega-menu a').forEach(a => {
+      a.addEventListener('click', () => { menuToggle.checked = false; });
+    });
   }
-  function closeMenu(){
-    megaMenu.classList.remove('open');
-    megaBackdrop.classList.remove('open');
-    document.body.classList.remove('menu-open');
-    burgerBtn.setAttribute('aria-expanded','false');
-  }
-  burgerBtn.addEventListener('click', openMenu);
-  megaClose.addEventListener('click', closeMenu);
-  megaBackdrop.addEventListener('click', closeMenu);
-  megaMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeMenu(); });
 </script>
 
 </body>
